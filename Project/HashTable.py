@@ -5,17 +5,24 @@ class ChainingHashTable:
         for i in range(initial_capacity):
             self.table.append([])
 
-    def insert(self, key, item):
-        package = hash(key) % len(self.table)
-        package_list = self.table[package]
+    def get_key(self, key):
+        bucket = int(key) % len(self.table)
+        return bucket
+
+    def insert(self, key, value):
+
+        bucket = hash(key) % len(self.table)
+        package_list = self.table[bucket]
 
         for kv in package_list:
             if kv[0] == key:
-                kv[1] = item
+                kv[1] = value
                 return True
+            else:
+                self.table.append([key, value])
 
-        value = [key, item]
-        package_list.append(value)
+        key_value = [key, value]
+        package_list.append(key_value)
         return True
 
     def search(self, key):

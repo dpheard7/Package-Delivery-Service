@@ -12,6 +12,8 @@ with open("Resources/WGUPS Distance Table.csv") as distances_csv:
 class Vertex:
     def __init__(self, label):
         self.label = label
+        self.distance = float("inf")
+        self.pred_vertex = None
 
 
 class Graph:
@@ -34,11 +36,16 @@ class Graph:
 graph = Graph()
 
 
-def get_distances():
-    for line in distance_list:
-        graph.add_vertex(line[1])
+# Draws graph using the edges and vertices created with distance_list
+# The loops are not nested and therefore the operations are linear, so the complexity is O(N)
+def draw_graph(name):
+    for edge in distance_list:
+        graph.add_vertex(edge[1])
 
-    for line in distance_list:
+    for edge in distance_list:
         for i in range(1, 28):
-            graph.add_undirected_edge(line[0], distance_list[i - 1][0], float(line[i]))
+            graph.add_undirected_edge(edge[0], distance_list[i - 1][0], float(edge[i]))
     return graph.edge_weights
+
+
+weights = draw_graph("Resources/WGUPS Distance Table.csv")

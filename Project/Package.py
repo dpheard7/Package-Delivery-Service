@@ -10,5 +10,6 @@ class Package:
         self.weight = weight
         self.notes = notes
         self.status = ""
-        self.delivery_time = None
+        self.delivery_time = ""
         self.truck_id = truck_id
+

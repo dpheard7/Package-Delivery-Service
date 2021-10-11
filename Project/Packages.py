@@ -13,3 +13,12 @@ class Package:
         self.delivery_time = ""
         self.truck_id = truck_id
 
+    def __str__(self):
+        return f"""
+        Package ID: {self.package_id}
+        Address: {self.address}
+        Truck: {self.truck_id}
+        """
+
+    def get_package_address(self):
+        return self.address

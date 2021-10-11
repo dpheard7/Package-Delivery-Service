@@ -15,12 +15,11 @@ class DeliveryTruck:
         self.speed = 18
         self.capacity = 16
         self.truck_list = []
-        self.truck_time = datetime.now()
-        self.location = ""
+        self.truck_time = ""
 
 
-def deliver_packages(truck, time):
-    i = 0
-    truck_mileage = 0
-    departure_time = truck.departure_time
-    starting_distance = float(100)
+# def deliver_packages(truck, time):
+#     i = 0
+#     truck_mileage = 0
+#     departure_time = truck.departure_time
+#     starting_distance = float(100)

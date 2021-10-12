@@ -54,41 +54,15 @@ graph = Graph()
 # Creates graph object using the edges and vertices created with distance and address data from csv file
 def draw_graph(name):
     for vertex_a in distance_list:
-        # print(f"vertex 0: {vertex_a[0]}")
         graph.add_vertex(vertex_a[0])
 
         # Prevents HUB from referencing itself in graph
         # Complexity O(N^2)
-        # ORIGINAL, DO NOT DELETE
     for edge in distance_list:
         for i in range(1, 28):
-            # print(f"edge 0: {edge[0]}")
             graph.add_undirected_edge(edge[0], distance_list[i - 1][0], float(edge[i]))
-
-                # TRIAL
-                # for vertex in distance_list:
-                #     min_dist = 9999
-                #     min_place = ""
-                #     for i in range(2, 28):
-                #         graph.add_undirected_edge(vertex[0], distance_list[i - 1][0], float(vertex[i]))
-                #         dist = int(vertex[1] - i)
-                #         if min_dist > dist:
-                #             min_dist = dist
-                #             min_place = vertex[0]
-
-                # print(f"min name/dist: {min_place, min_dist}")
-
-                # return graph.edge_weights
-
     return graph.edge_weights
 
 
-# def shortest_path(drawn_graph):
-#     k = range(len(route_graph))
-#     path = {(i, j): route_graph[i][j] for i in k for j in k}
-#     print(f"shortest path: {route_graph}")
-
-
-# print(distance_list[0])
 route_graph = draw_graph("Resources/WGUPS Distance Table.csv")
-# print(f"route graph: {route_graph}")
+

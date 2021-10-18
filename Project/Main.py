@@ -92,22 +92,31 @@ def get_shortest_route(truck_load, current_address):
     return delivery_distance, delivery_index
 
 
-def deliver_packages(truck, start_address):
+def deliver_packages(truck_load, start_address):
     total_miles = 0.0
     total_mileage = []
+    unvisited_queue = []
+    visited_queue = []
 
-    while len(truck) > 0:
-        delivery_distance, delivery_index = get_shortest_route(truck, start_address)
-        total_mileage.append(delivery_distance)
+    while len(truck_load) > 0:
+        for package in truck_load:
+            # Gets shortest route from truck's starting point to closest available package destination.
+            # Appends trip mileage into mileage list to be summed later
+            delivery_distance, delivery_index = get_shortest_route(truck_load, start_address)
+            total_mileage.append(delivery_distance)
 
-        trip_time = time_calculator(delivery_distance)
-        print(f"trip time: {trip_time}")
+            # Calculates trip time based on mileage
+            trip_time = time_calculator(delivery_distance)
+            print(f"trip time: {trip_time}")
 
-        total_miles = sum(total_mileage)
-        print(f"total miles: {total_miles}")
+            # Sums mileage for entire delivery route
+            total_miles = sum(total_mileage)
+            print(f"total miles: {total_miles}")
 
-        package = hashtable.search(int(package_id))
-        start_address = package.address
+            package = hashtable.search(int(package))
+            start_address = package.address
+
+            truck_load.remove(package)
 
 
 deliver_packages(truck_1_load, hub_address)

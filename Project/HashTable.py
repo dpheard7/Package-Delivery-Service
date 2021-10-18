@@ -29,20 +29,12 @@ class ChainingHashTable:
         # print(f"package list: {package_list}")
 
         for pack in package_list:
-            print(f"search key: {key}")
+            # print(f"search key: {key}")
 
             if pack[0] == key:
                 return pack[1]
             else:
                 print(f"Key {key} is invalid.")
-
-        # for package in package_list:
-        #     if package in package_list:
-        #         value_index = package_list.index(key)
-        #         return package[1]
-        #     else:
-        #         print(f"Key {key} is invalid.")
-        #         return package
 
     def remove(self, key):
         package = hash(key) % len(self.table)

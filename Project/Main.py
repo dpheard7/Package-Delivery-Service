@@ -1,12 +1,8 @@
 import csv
-import operator
 from datetime import timedelta
 
-import self
-
-from Project import Algorithm
-from Project.Algorithm import get_shortest_path, shortest, dijkstra
-from Project.Distances import Graph, route_graph, distance_list, draw_graph
+from Project.Delivery import new_distance_search
+from Project.Distances import Graph, distance_array
 from Project.HashTable import ChainingHashTable
 from Project.Packages import Package
 from Trucks import DeliveryTruck
@@ -19,12 +15,14 @@ truck_2_load = ["3", "5", "7", "11", "17", "18", "23", "25", "26", "30", "35", "
 truck_3_load = ["6", "8", "9", "10", "12", "27", "28", "31", "32", "39"]
 
 # Starting address for trucks
-hub_address = "HUB"
+hub_address = "4001 South 700 East"
+hub_address1 = "Western Governors University\n4001 South 700 East, \nSalt Lake City, UT 84107"
 
 # Three truck objects initialized with IDs, hub address, starting time, and list of packages
 truck_1 = DeliveryTruck(1, hub_address, timedelta(hours=8), 0, truck_1_load)
 truck_2 = DeliveryTruck(2, hub_address, timedelta(hours=8), 0, truck_2_load)
 truck_3 = DeliveryTruck(3, hub_address, timedelta(hours=9, minutes=45), 0, truck_3_load)
+print(f"truck 1: {truck_1}")
 
 # Reads package file, inserts package objects into hash table
 with open("Resources/WGUPS_Package_File.csv") as packages_csv:
@@ -49,21 +47,12 @@ with open("Resources/WGUPS_Package_File.csv") as packages_csv:
         hashtable.set(int(new_package.package_id), new_package)
         # print(f"package {new_package.package_id}, loaded on truck {new_package.truck_id}")
 
+
 # PRINT TEST AREA
-print(f"route graph (adjacency matrix): {len(route_graph)}")
+print(f"new distance search:\n{new_distance_search('4001 South 700 East', '1060 Dalton Ave S')}")
 
-
-# print(f"graph data type: {(type(route_graph))}")
-# print(f"distance list: {distance_list}")
-# paths = get_shortest_path("" + hub_address, route_graph)
-# print(f"shortest path: {paths}")
-
-
-# print(hashtable.__dict__)
-# for key, value in hashtable:
-#     print(hashtable.get(key, value))
-# print(hashtable)
-
+# print(f"invoking get_distance : {get_distance('4001 South 700 East', '1060 Dalton Ave S')}")
+# get_shortest_route(truck_1, hub_address)
 
 # def search_truck(truck_load):
 #     packages = []
@@ -79,41 +68,6 @@ print(f"route graph (adjacency matrix): {len(route_graph)}")
 #     print()
 
 
-# search_truck(truck_2_load)
-
-# search_package = hashtable.search(10)
-
-# print(f"search package: {str(search_package)}")
-
-# print(f"shortest distance: {get_shortest_path(route_graph)}")
-
-def find_min(g):
-    m = min(i for i in g if i > 0)
-    for value in g.items:
-        if value == 0:
-            continue
-    # print(f"rg min: {min(route_graph.items(), key=lambda x:x[1])}")
-
-
-# for d in route_graph:
-#     print(f"keys: {route_graph.values()}")
-
-# print(f"shortest path: {shortest(route_graph)}")
-
-# print(f"rg1: {route_graph[0]}")
-
-
-# def nearest_neighbor(drawn_graph):
-#     shortest_path = 0
-#     for k in drawn_graph:
-#         if k == k:
-#             continue
-
-
-# print(Algorithm.dijkstra(route_graph, 'HUB')) - prints 'None'
-# print(truck_1.__dict__)
-
-
 #  calculates the time it takes to reach an address by the miles traveled
 def time_calculator(miles):
     time = miles / 18
@@ -122,115 +76,153 @@ def time_calculator(miles):
 
 # truck_graph = draw_graph()
 
-print(f"distance list: {distance_list}")
-
 package_distances = []
 
-# def find_distance(current_location, destination, package):
-#     if()
 
-string = "address list : "
-
-
-def run_delivery(truck, g, delivery_time):
-    test_truck = truck_1
-    test_truck.set_truck_location()
-    truck_load = test_truck.package_list
-    current_distance = float(100)
-    current_mileage = 0
-    current_time = test_truck.departure_time
-    i = 0
-    j = i + 1
-    # g = Graph
-    address_list = []
-    route_list = {}
-    next_stop = None
-    next_stop_dist = None
-    pack_address = None
-    filtered_dist = None
-    pack_dest = None
-    pack1 = Package
-    path = None
-    best_route = []
-    min_dist = 999
-
-    print(f"test truck's package list is: {test_truck.package_list}")
-    # load = get_package_info(truck_2_load, hashtable)
-    # print(f"truck 2 package info: {load}")
-
-    # while len(truck_load) > 1:
-    for package in truck_load:
-        result = hashtable.search(int(package))
-        address_list.append(result)
-
-        # breakpoint()
-        for x in address_list:
-            pack_address = x.address
-            # print(f"pack x address = {pack_address}")
-
-            for y in address_list:
-                pack_dest = y.address
-
-            for route, mileage in g.items():
-                if str(pack_address) and str(pack_dest) in str(route):
-                    if mileage > 0.0:
-                        next_stop = route
-                        next_stop_dist = mileage
-                        kv = next_stop, next_stop_dist
-                        route_list.update({kv})
-    path = get_shortest_path(route_list)
-    # print(f"shortest path: {path}")
-
-    # print(*address_list)
-    # print(f"len: {len(address_list)}")
-    print(f"pack addresses # = {len(pack_address)}")
-    # print(f"pack addresses: {pack_address}")
-    print(f"pack destinations: {len(pack_dest)}")
-
-    print(f"route list: {route_list}")
-    print(f"route list length: {len(route_list)}")
-
-    # address_list.append(package.get_package_address())
-    #
-    # Algorithm.get_shortest_path(hub_address, route_graph)
-    # shortest_distance = Algorithm.get_shortest_path(route_graph)
-    #
-    # index = 0
-    # test_truck.truck_location = hub_address
-    # value = None
-    #
-    # while len(test_truck.package_list) != 0:
-    #     while index < len(test_truck.package_list):
-    #         # breakpoint()
-    #
-    #         current_truck_location = test_truck.truck_location
-    #         print(f"truck location: {current_truck_location}")
-    #         current_package = hashtable.search(int(test_truck.package_list[index]))
-    #         print(f"current package is: {current_package}")
-    #         # print("current package: " + str(current_package.address))
-    #         package_address = current_package.address
-    #         # breakpoint()
-    #         new_distance = Algorithm.get_shortest_path(hub_address, route_graph)
-    #         print(f"new distance: {new_distance}")
-    #
-    #         if float(current_distance) > float(new_distance):
-    #             current_distance = float(new_distance)
-    #             location = current_package.address
-    #             package = current_package
-    #             value = test_truck.package_list[index]
-    #         index = index + 1
-    #     index = 0
-    #
-    #     test_truck.truck_location = location
-    #     test_truck.package_list.remove(value)
-    #     test_truck.mileage = current_mileage + float(current_distance)
-    #     current_time = package.delivery_time = current_time + time_calculator(current_distance)
-    #     current_distance = float(100)
+def get_shortest_route(truck_load, current_address):
+    delivery_distance = 999
+    delivery_index = -1
+    for package_id in truck_load:
+        current_package = hashtable.search(int(package_id))
+        print(f"current package: {package_id}")
+        distance, selected_delivery_index = new_distance_search(current_address, current_package.address)
+        if distance < delivery_distance:
+            delivery_distance = distance
+            delivery_index = selected_delivery_index
+    return delivery_distance, delivery_index
 
 
-def start_routes(time):
-    run_delivery(truck_1, route_graph, timedelta(hours=8))
+def deliver_packages(truck, start_address):
+    total_miles = 0.0
+    total_mileage = []
+
+    while len(truck) > 0:
+        delivery_distance, delivery_index = get_shortest_route(truck, start_address)
+        total_mileage.append(delivery_distance)
+
+        trip_time = time_calculator(delivery_distance)
+        print(f"trip time: {trip_time}")
+
+        total_miles = sum(total_mileage)
+        print(f"total miles: {total_miles}")
+
+        package = hashtable.search(int(package_id))
+        start_address = package.address
 
 
-start_routes(timedelta(8))
-print(f"Mileage:\nTruck 1: {truck_1.mileage}")
+deliver_packages(truck_1_load, hub_address)
+
+
+# def get_shortest_route(truck, g, delivery_time, current_address):
+#     truck.set_truck_location()
+#     truck_load = truck.package_list
+#     current_address = hub_address
+#     current_distance = float(100)
+#     current_mileage = 0
+#     current_time = truck.departure_time
+#     i = 0
+#     j = i + 1
+#     # g = Graph
+#     address_list = []
+#     route_list = {}
+#     next_stop = None
+#     next_stop_dist = None
+#     pack_start = None
+#     filtered_dist = None
+#     pack_dest = None
+#     pack1 = Package
+#     path = None
+#     unvisited_queue = []
+#     minimum_distance = 999.9
+#     visited_queue = []
+#     # print(f"route graph items: {route_graph.items()}")
+#     total_mileage = 0.0
+#     visited_locations = []
+#     start_address = 'HUB'
+#     dict_1 = {}
+#     g = Graph()
+#     current_location = None
+#     package_address = None
+#
+#     # Retrieves addresses of truck's package list and inserts into address_list
+#     while len(truck_load) > 0:
+#
+#         for package in truck_load:
+#             result = hashtable.search(package)
+#             current_package = result.address
+#             print(f"current package: {current_package}")
+#             if current_package > current_address:
+#                 dist = float(distance_array[current_package][current_address])
+#             else:
+#                 dist = float(distance_array[current_address][current_package])
+#             # If this route is shorter than others we've checked, use it for now
+#             if dist < minimum_distance:
+#                 short_route = dist
+#                 next_package = package
+#                 next_addr_num = current_package
+#
+#         return next_package, next_addr_num, minimum_distance
+
+
+        # result = hashtable.search(int(package))
+            # package_address = result.address
+            # print(f"result address {package_address}")
+            # address_list.append(package_address)
+            # truck_load.pop(0)
+            # visited_locations.append(package_address)
+            # print(f"truckload size: {len(truck_load)}")
+            #
+            # current_location = hub_address
+            # print(f"current location: {current_location}")
+            # print(f"package addy: {package_address}")
+
+#             route_list_1 = [value for key, value in route_graph.items() if str(key[0]) == str(current_location) and str(key[1]) == str(package_address)]
+#             print(f"route list 1: {route_list_1}")
+#
+#
+# run_delivery(truck_1, route_graph, timedelta(hours=8))
+
+# address_list.append(package.get_package_address())
+#
+# Algorithm.get_shortest_path(hub_address, route_graph)
+# shortest_distance = Algorithm.get_shortest_path(route_graph)
+#
+# index = 0
+# test_truck.truck_location = hub_address
+# value = None
+#
+# while len(test_truck.package_list) != 0:
+#     while index < len(test_truck.package_list):
+#         # breakpoint()
+#
+#         current_truck_location = test_truck.truck_location
+#         print(f"truck location: {current_truck_location}")
+#         current_package = hashtable.search(int(test_truck.package_list[index]))
+#         print(f"current package is: {current_package}")
+#         # print("current package: " + str(current_package.address))
+#         package_address = current_package.address
+#         # breakpoint()
+#         new_distance = Algorithm.get_shortest_path(hub_address, route_graph)
+#         print(f"new distance: {new_distance}")
+#
+#         if float(current_distance) > float(new_distance):
+#             current_distance = float(new_distance)
+#             location = current_package.address
+#             package = current_package
+#             value = test_truck.package_list[index]
+#         index = index + 1
+#     index = 0
+#
+#     test_truck.truck_location = location
+#     test_truck.package_list.remove(value)
+#     test_truck.mileage = current_mileage + float(current_distance)
+#     current_time = package.delivery_time = current_time + time_calculator(current_distance)
+#     current_distance = float(100)
+
+
+# def start_routes(time):
+#     run_delivery(truck_1, route_graph, timedelta(hours=8))
+#
+#
+# start_routes(timedelta(8))
+

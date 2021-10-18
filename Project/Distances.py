@@ -2,6 +2,8 @@ import csv
 
 from Project import Algorithm
 
+distance_array = []
+
 
 # Creates vertices for use in drawing the graph
 class Vertex:
@@ -34,35 +36,40 @@ class Graph:
         self.add_directed_edge(vertex_b, vertex_a, weight)
 
     def find_dist(self, start_v, end_v):
+        for key, value in self.edge_weights:
+            if (start_v == key[0]) and (end_v == key[1]):
+                return value
         return [value for key, value in self.edge_weights.items() if key[0] == start_v and key[1] == end_v]
 
 
-distance_list = []
+my_graph = Graph()
 
-
-with open("Resources/WGUPS Distance Table.csv") as distances_csv:
+# Reads distances from csv and appends to distance_array, skipping the first column (addresses)
+# O(N)
+with open("Resources/WGUPS Distance Table_csv.csv", encoding='utf-8-sig') as distances_csv:
     read_distances = csv.reader(distances_csv, delimiter=",")
-    # read_distances.__next__()
-    next(read_distances, None)
+    next(read_distances)
     for i in read_distances:
-        distance_list.append(i)
-# print(distance_list)
+        distance_array.append(i)
+print(f"distance array unformatted: {distance_array}")
+print("distance array formatted: \n" + '\n'.join([''.join(['{:4}'.format(item) for item in row])
+                                                  for row in distance_array]))
+
+# print(f"test: {distance_array[4][2]}")
+# for distance array, first number is rows down, second is columns across. eg distance_array[4][2] = 5 rows down,
+# 3 rows across (starting with 0 as the first row
+
+
+address_array = []
+
+# Reads addresses only from csv and appends to address_array, skipping all of the distance information
+# O(N)
+with open("Resources/Locations.csv", encoding='utf-8-sig') as addresses_csv:
+    read_addresses = csv.reader(addresses_csv, delimiter=",")
+    for row in read_addresses:
+        row[1].strip()
+        address_array.append(row)
+print(f"address array in Distances = {address_array}")
+
 
 graph = Graph()
-
-
-# Creates graph object using the edges and vertices created with distance and address data from csv file
-def draw_graph(name):
-    for vertex_a in distance_list:
-        graph.add_vertex(vertex_a[0])
-
-        # Prevents HUB from referencing itself in graph
-        # Complexity O(N^2)
-    for edge in distance_list:
-        for i in range(1, 28):
-            graph.add_undirected_edge(edge[0], distance_list[i - 1][0], float(edge[i]))
-    return graph.edge_weights
-
-
-route_graph = draw_graph("Resources/WGUPS Distance Table.csv")
-

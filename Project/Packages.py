@@ -29,3 +29,11 @@ class Package:
 
     def get_package_address(self):
         return self.address
+
+    def set_package_address(self, new_address):
+        self.address = self.address
+
+    def fix_address(self):
+        self.address = "410 S State St"
+        self.city = "Salt Lake City"
+        self.postal = "84111"

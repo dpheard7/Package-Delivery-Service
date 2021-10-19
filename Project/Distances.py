@@ -28,4 +28,4 @@ with open("Resources/Locations.csv", encoding='utf-8-sig') as addresses_csv:
     for row in read_addresses:
         row[1].strip()
         address_array.append(row)
-print(f"address array in Distances = {address_array}")
+# print(f"address array in Distances = {address_array}")

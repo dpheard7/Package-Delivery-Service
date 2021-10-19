@@ -9,8 +9,8 @@ class Package:
         self.deadline = deadline
         self.weight = weight
         self.notes = notes
-        self.status = ""
-        self.delivery_time = ""
+        self.status = "At hub"
+        self.delivery_time = None
         self.hub_departure = ""
         self.miles = 0.0
         self.truck_id = truck_id
@@ -37,3 +37,6 @@ class Package:
         self.address = "410 S State St"
         self.city = "Salt Lake City"
         self.postal = "84111"
+
+    def get_package_stats(self):
+        return self.status

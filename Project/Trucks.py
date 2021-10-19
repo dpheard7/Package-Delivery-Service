@@ -17,7 +17,9 @@ class DeliveryTruck:
         self.package_list = package_list
         self.speed = 18
         self.capacity = 16
-        self.truck_time = ""
+        self.return_time = ""
+        self.truck_status = ""
+        self.time_list = []
 
     def get_truck_location(self):
         return self.truck_location

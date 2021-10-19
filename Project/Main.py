@@ -8,26 +8,30 @@ from Project.HashTable import ChainingHashTable
 from Project.Packages import Package
 from Trucks import DeliveryTruck
 
-hashtable = ChainingHashTable()
-
 # Packages presorted by distance and package requirements, trucks loaded manually with package list
-truck_1_load = ["1", "2", "4", "13", "14", "15", "16", "19", "20", "21", "22", "24", "29", "33", "34", "40"]
-truck_2_load = ["3", "5", "7", "11", "17", "18", "23", "26", "30", "35", "36", "37", "38"]
-truck_3_load = ["6", "8", "9", "10", "12", "25", "27", "28", "31", "32", "39"]
+truck_1_load = ["13", "14", "15", "16", "19", "20", "21", "24", "25", "29", "33", "34", "40"]
+truck_2_load = ["1", "2", "3", "5", "7", "11", "17", "18", "23", "26", "30", "31", "35", "36", "37", "38"]
+truck_3_load = ["4", "6", "8", "9", "10", "12", "27", "28", "32", "39"]
 truck_mileage_list = []
 all_trucks_mileage = []
+delivery_time_list = []
+hashtable = ChainingHashTable()
 
 # Starting address for trucks
 hub_address = "4001 South 700 East"
-hub_address1 = "Western Governors University\n4001 South 700 East, \nSalt Lake City, UT 84107"
 
-# Three truck objects initialized with IDs, hub address, starting time, and list of packages
+# Three truck objects initialized with IDs, hub address, starting time, and list of packages.
+# Truck 3 also leaves after Truck 1 arrives back at hub, verified with time stamps.
 truck_1 = DeliveryTruck(1, hub_address, timedelta(hours=8), 0, truck_1_load)
 truck_2 = DeliveryTruck(2, hub_address, timedelta(hours=8), 0, truck_2_load)
-truck_3 = DeliveryTruck(3, hub_address, timedelta(hours=9, minutes=5), 0, truck_3_load)
-print(f"truck 1: {truck_1}")
+truck_3 = DeliveryTruck(3, hub_address, timedelta(hours=9, minutes=41), 0, truck_3_load)
 
-# Reads package file, inserts package objects into hash table
+"""
+Reads package file and inserts data objects into hash table, creating Package objects.
+Package 9 has the wrong address. This will be updated automatically and the package isn't delivered until well after
+the new information comes in. 
+Time/space complexity of O(N) as space needed is directly proportional to input size.
+"""
 with open("Resources/WGUPS_Package_File.csv") as packages_csv:
     read_packages = csv.reader(packages_csv, delimiter=",")
     for row in read_packages:
@@ -77,32 +81,40 @@ def get_shortest_route(truck_load, current_address):
     return delivery_distance, delivery_index
 
 
+"""
+Main function/nearest neighbor algorithm to deliver packages. The function cycles through each truck's package list, 
+searching the hash table for package addresses. It then delivers the package to that location, timestamps the 
+delivery time, and records mileage.
+"""
+
+
 def deliver_packages(truck, truck_load, start_address):
-    total_miles = 0.0
-    time_list = []
-    unvisited_queue = []
     visited_queue = []
-    return_distance = 0.0
 
     while len(truck_load) > 0:
         for package in truck_load:
             # Gets shortest route from truck's starting point to closest available package destination.
             # Appends trip mileage into mileage list to be summed later
             delivery_distance, delivery_index = get_shortest_route(truck_load, start_address)
-            print(f"\nshortest route: {delivery_distance, delivery_index}\npackage id: {package}")
 
             truck_mileage_list.append(delivery_distance)
 
             # Calculates trip time based on mileage
             trip_time = time_calculator(delivery_distance)
-            time_list.append(trip_time)
-            print(f"trip time: {trip_time}")
+            delivery_time_list.append(trip_time)
 
             # Searches hash table and sets next stop as next package's address
             package = hashtable.search(int(package))
             start_address = package.address
-            print(f"start address : {start_address}\n")
-            # package.delivery_time =
+            package.hub_departure = truck.departure_time
+            # print(f"start address : {start_address}\n")
+
+            package.delivery_time = sum(delivery_time_list, datetime.timedelta()) + truck.departure_time
+            print(f"package status : {package.status}")
+            print(f"delivery time of package {package.package_id}: {package.delivery_time}")
+            package.status = "Delivered!"
+            print(f"package status : {package.status}")
+
             visited_queue.append(package.address)
             print(f"visited queue : {visited_queue}")
             truck_load.remove(package.package_id)
@@ -110,6 +122,10 @@ def deliver_packages(truck, truck_load, start_address):
     if len(truck_load) == 0:
         return_distance, index = new_distance_search(visited_queue[-1], hub_address)
         truck_mileage_list.append(return_distance)
+        delivery_time_list.append(time_calculator(return_distance))
+        truck.truck_location = hub_address
+        delivery_time_list.clear()
+
         print(f"return distance: {return_distance}")
 
     # Sums mileage for entire delivery route
@@ -118,32 +134,43 @@ def deliver_packages(truck, truck_load, start_address):
 
     truck.mileage = round(total_miles, 2)
     print(f"total truck miles: {truck.truck_id}, {float(truck.mileage)}")
+    delivery_time_spent = time_calculator(truck.mileage)
+    return_time = delivery_time_spent + truck.departure_time
+    truck.return_time = return_time
+    print(f"truck return time: {return_time}")
 
     all_trucks_mileage.append(truck.mileage)
     print(f"all trucks mileage: {all_trucks_mileage}")
     truck_mileage_list.clear()
 
-    total_time = sum(time_list, datetime.timedelta()) + truck.departure_time
-    print(f"total time: {total_time}")
+
+def set_package_status(package):
+    if package.delivery_time is None:
+        package.status = "No"
+
 
 
 def calc_total_mileage(all_miles_list):
     cumulative_mileage = round(sum(all_miles_list), 2)
-    print(f"cumulative mileage: {cumulative_mileage}")
     return cumulative_mileage
 
 
-# def package_status_function():
+def run_delivery():
+    deliver_packages(truck_1, truck_1_load, hub_address)
+    print(f"truck 1 departure time: {truck_1.departure_time}")
+    deliver_packages(truck_2, truck_2_load, hub_address)
+    print(f"truck 2 departure time: {truck_2.departure_time}")
+    deliver_packages(truck_3, truck_3_load, hub_address)
+    print(f"truck 3 departure time: {truck_3.departure_time}")
+
+    cumulative_mileage = calc_total_mileage(all_trucks_mileage)
+    print(f"truck 1 mileage: {truck_1.mileage}")
+    print(f"truck 2 mileage: {truck_2.mileage}")
+    print(f"truck 3 mileage: {truck_3.mileage}")
+    print(f"cumulative mileage: {cumulative_mileage}")
 
 
-deliver_packages(truck_1, truck_1_load, hub_address)
-deliver_packages(truck_2, truck_2_load, hub_address)
-deliver_packages(truck_3, truck_3_load, hub_address)
-calc_total_mileage(all_trucks_mileage)
-print(f"truck 1 mileage: {truck_1.mileage}")
-print(f"truck 2 mileage: {truck_2.mileage}")
-print(f"truck 3 mileage: {truck_3.mileage}")
-
+run_delivery()
 
 # cumulative_miles = sum(all_trucks_mileage)
 # print(f"mileage for all trucks: {cumulative_miles}")
